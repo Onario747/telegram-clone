@@ -1,18 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "next.config.js",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/"
-    }
-  ],
-  "env": {
-    "NEXT_PUBLIC_BASE_URL": "https://xelegram.onrender.com"
-  }
+  "buildCommand": "next build",
+  "installCommand": "npm install",
+  "framework": "nextjs"
 }
