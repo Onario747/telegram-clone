@@ -1,0 +1,141 @@
+.loginContainer {
+  max-width: 400px;
+  width: 90%;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  text-align: center;
+  background: var(--background-primary);
+}
+
+.loginHeader {
+  margin-bottom: 2rem;
+}
+
+.loginHeader h1 {
+  font-size: 1.8rem;
+  margin: 1rem 0;
+  color: var(--text-primary);
+}
+
+.loginHeader p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.phoneStep, .codeStep {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.phoneStep h2, .codeStep h2 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.inputGroup {
+  position: relative;
+  width: 100%;
+}
+
+.phoneInput {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--input-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.phoneInput:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 136, 204, 0.1);
+}
+
+.phoneInput:disabled {
+  background-color: var(--disabled-background);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.submitButton, .backButton {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submitButton {
+  background-color: var(--primary-color);
+  color: white;
+  flex: 2;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: var(--primary-color-dark);
+}
+
+.backButton {
+  background-color: var(--secondary-button-background);
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.backButton:hover:not(:disabled) {
+  background-color: var(--secondary-button-hover);
+}
+
+.submitButton:disabled, .backButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Dark mode styles */
+.dark {
+  --background-primary: #1f1f1f;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #404040;
+  --input-background: #2d2d2d;
+  --disabled-background: #1a1a1a;
+  --primary-color: #2AABEE;
+  --primary-color-dark: #229ed9;
+  --secondary-button-background: #333333;
+  --secondary-button-hover: #404040;
+}
+
+/* Light mode styles */
+.light {
+  --background-primary: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  --input-background: #ffffff;
+  --disabled-background: #f5f5f5;
+  --primary-color: #2AABEE;
+  --primary-color-dark: #229ed9;
+  --secondary-button-background: #f0f0f0;
+  --secondary-button-hover: #e5e5e5;
+}
