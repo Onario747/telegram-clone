@@ -159,27 +159,14 @@ export default function UserProfile({ user, onClose, sessionString }) {
       )}
 
       <div className={styles.actions}>
-        {userInfo?.type !== "Channel" && userInfo?.username === userName ? (
-          <button 
-            className={styles.actionButton}
-            onClick={() => setIsEditing(true)}
-          >
-            Edit Profile
-          </button>
-        ) : (
-          <>
-            {userInfo?.type === "Channel" && (
-              <button className={styles.actionButton}>
-                Join Channel
-              </button>
-            )}
-            {userInfo?.type !== "Channel" && (
-              <button className={styles.actionButton}>
-                Send Message
-              </button>
-            )}
-          </>
-        )}
+        <button 
+          className={styles.actionButton}
+          onClick={() => setIsEditing(true)}
+        >
+          Edit Profile
+        </button>
+        <button className={styles.actionButton}>Send Message</button>
+        <button className={styles.actionButton}>Share Contact</button>
       </div>
 
       <AnimatePresence>
