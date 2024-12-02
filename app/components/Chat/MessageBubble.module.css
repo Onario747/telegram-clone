@@ -7,17 +7,6 @@
   animation: fadeIn 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .sent {
   margin-left: auto;
   flex-direction: row-reverse;
@@ -28,9 +17,9 @@
 }
 
 .messageContent {
-  background-color: var(--message-background);
+  background-color: var(--received-message-background);
   padding: 8px 12px;
-  border-radius: 16px;
+  border-radius: 12px;
   position: relative;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   max-width: 100%;
@@ -60,6 +49,7 @@
 .messageInfo {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
   margin-top: 4px;
   min-height: 16px;
@@ -73,34 +63,19 @@
 
 .sent .messageTime {
   color: var(--sent-message-text);
-}
-
-.optionsButton {
-  opacity: 0;
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: opacity 0.2s ease;
-  border-radius: 50%;
-}
-
-.messageContainer:hover .optionsButton {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .optionsMenu {
   position: absolute;
-  top: -50px;
+  top: -40px;
   background-color: var(--background-primary);
-  border-radius: 24px;
-  padding: 6px;
+  border-radius: 20px;
+  padding: 4px;
   display: flex;
   gap: 4px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   z-index: 10;
-  border: 1px solid var(--border-color);
 }
 
 .sent .optionsMenu {
@@ -118,33 +93,21 @@
   cursor: pointer;
   border-radius: 50%;
   transition: all 0.2s ease;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--text-secondary);
 }
 
 .optionsMenu button:hover {
   background-color: var(--hover-background);
-  transform: scale(1.1);
+  color: var(--primary-color);
 }
 
-.messageLink {
-  color: var(--link-color);
-  text-decoration: none;
-  word-break: break-all;
-}
-
-.messageLink:hover {
-  text-decoration: underline;
-  opacity: 0.9;
-}
-
-/* Theme-specific styles */
-.dark {
-  --link-color: #64B5F6;
-}
-
-.light {
-  --link-color: #1976D2;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

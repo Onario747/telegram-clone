@@ -16,8 +16,10 @@ export function Message({ message, onReact }) {
       onDoubleClick={() => setShowReactions(!showReactions)}
     >
       {!message.isMine && (
-        <img 
-          src={message.sender.userPicture?.fileReference || '/default-avatar.png'} 
+        <img
+          src={
+            message.sender.userPicture?.fileReference || "/default-avatar.png"
+          }
           alt={message.sender.username}
           className={styles.avatar}
         />
@@ -32,12 +34,15 @@ export function Message({ message, onReact }) {
           {message.messageText}
           {message.file && (
             <div className={styles.attachment}>
-              {message.file.type.startsWith('image/') ? (
+              {message.file.type.startsWith("image/") ? (
                 <img src={URL.createObjectURL(message.file)} alt="attachment" />
-              ) : message.file.type.startsWith('audio/') ? (
+              ) : message.file.type.startsWith("audio/") ? (
                 <audio controls src={URL.createObjectURL(message.file)} />
               ) : (
-                <a href={URL.createObjectURL(message.file)} download={message.file.name}>
+                <a
+                  href={URL.createObjectURL(message.file)}
+                  download={message.file.name}
+                >
                   {message.file.name}
                 </a>
               )}
@@ -49,7 +54,7 @@ export function Message({ message, onReact }) {
         </div>
       </div>
       {showReactions && (
-        <motion.div 
+        <motion.div
           className={styles.reactions}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}

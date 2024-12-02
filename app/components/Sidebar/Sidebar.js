@@ -4,7 +4,8 @@ import { SearchBar } from "./SearchBar";
 import { SearchResults } from "./SearchResults";
 import { useTheme } from "../../context/ThemeContext";
 import styles from "./Sidebar.module.css";
-import { FiMenu } from 'react-icons/fi';
+import { FiMenu } from "react-icons/fi";
+import { FiThumbtack } from "react-icons/fi";
 
 export default function Sidebar({
   searchQuery,
@@ -15,48 +16,64 @@ export default function Sidebar({
   onSearch,
   onChatSelect,
   onRefreshChats,
-  onLogout,
-  onMenuClick
+  onMenuClick,
+  loading,
 }) {
   const { isDarkMode } = useTheme();
 
   const getInitials = (username) => {
     return username
       ? username
-          .split(' ')
-          .map(word => word[0])
-          .join('')
+          .split(" ")
+          .map((word) => word[0])
+          .join("")
           .toUpperCase()
           .slice(0, 2)
-      : '?';
+      : "?";
   };
 
+  const filteredChats = chatList.filter(
+    (chat) =>
+      // Remove chats with null usernames
+      chat.username !== null &&
+      // Remove forbidden chats
+      chat.type !== "ChatForbidden"
+  );
+
+  // Sort chats to show pinned ones at the top
+  const sortedChats = [...filteredChats].sort((a, b) => {
+    // First sort by pinned status
+    if (a.pinned !== b.pinned) {
+      return b.pinned - a.pinned;
+    }
+    // Then sort by latest message date if available
+    const aDate = a.latestMessage?.date || 0;
+    const bDate = b.latestMessage?.date || 0;
+    return bDate - aDate;
+  });
+
   return (
-    <div className={`${styles.sidebar} ${isDarkMode ? styles.dark : styles.light}`}>
+    <div
+      className={`${styles.sidebar} ${isDarkMode ? styles.dark : styles.light}`}
+    >
       <div className={styles.sidebarHeader}>
         <div className={styles.headerTop}>
-          <button 
-            className={styles.menuButton}
-            onClick={onMenuClick}
-          >
+          <button className={styles.menuButton} onClick={onMenuClick}>
             <FiMenu size={24} />
           </button>
           <h2>Telegram</h2>
         </div>
-        <SearchBar 
+        <SearchBar
           value={searchQuery}
           onChange={onSearchQueryChange}
           onSearch={onSearch}
+          onSelectResult={onChatSelect}
+          results={searchResults}
+          loading={loading}
         />
-        <button 
-          className={styles.logoutButton}
-          onClick={onLogout}
-        >
-          Logout
-        </button>
       </div>
       {searchQuery ? (
-        <SearchResults 
+        <SearchResults
           users={searchResults.users}
           channels={searchResults.channels}
           onSelect={onChatSelect}
@@ -64,7 +81,7 @@ export default function Sidebar({
         />
       ) : (
         <div className={styles.chatList}>
-          {chatList.map((chat) => (
+          {sortedChats.map((chat) => (
             <motion.div
               key={chat.chatRoomId}
               className={styles.chatItem}
@@ -76,24 +93,26 @@ export default function Sidebar({
               {chat.profileImage ? (
                 <img
                   src={chat.profileImage}
-                  alt={chat.username}
+                  alt={chat.title}
                   className={styles.profileImage}
                   onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
                   }}
                 />
               ) : (
                 <div className={styles.profileImagePlaceholder}>
-                  {getInitials(chat.username)}
+                  {getInitials(chat.title)}
                 </div>
               )}
               <div className={styles.chatInfo}>
                 <div>
-                  <div className={styles.username}>{chat.username}</div>
+                  <div className={styles.username}>
+                    {chat.title} {chat.pinned && <FiThumbtack size={14} />}
+                  </div>
                   {chat.latestMessage && (
                     <div className={styles.lastMessage}>
-                      {chat.latestMessage.text || 'No messages yet'}
+                      {chat.latestMessage.text || "No messages yet"}
                     </div>
                   )}
                 </div>
@@ -105,8 +124,11 @@ export default function Sidebar({
               </div>
             </motion.div>
           ))}
+          {sortedChats.length === 0 && (
+            <div className={styles.noChats}>No chats available</div>
+          )}
         </div>
       )}
     </div>
   );
-} 
+}

@@ -121,6 +121,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 150px; /* Adjust based on your design */
 }
 
 .unreadBadge {
@@ -301,5 +302,12 @@
   margin-bottom: 0;
   padding: 0;
   border-bottom: none;
+}
+
+.noChats {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
  
