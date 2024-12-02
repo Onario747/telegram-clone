@@ -65,40 +65,13 @@ export default function TelegramApp() {
       if (savedSession && isLoggedInSaved === 'true') {
         const parsedSession = JSON.parse(savedSession);
         
-        try {
-          const response = await axios.post(`${BASE_URL}/t/api/refresh`, {
-            sessionString: parsedSession.sessionString,
-          });
-
-          if (response.data.sessionString) {
-            const updatedSession = {
-              ...parsedSession,
-              sessionString: response.data.sessionString,
-            };
-            
-            // Update localStorage with new session
-            localStorage.setItem('telegramSession', JSON.stringify(updatedSession));
-            
-            // Update state
-            setSessionData(updatedSession);
-            setUserName(savedUserName);
-            setIsLoggedIn(true);
-            
-            // Fetch chats after successful session refresh
-            await fetchChats();
-          } else {
-            throw new Error('Invalid session');
-          }
-        } catch (error) {
-          console.error('Session refresh failed:', error);
-          // Clear all stored data on error
-          localStorage.removeItem('telegramSession');
-          localStorage.removeItem('telegramUserName');
-          localStorage.removeItem('isLoggedIn');
-          setSessionData(null);
-          setUserName(null);
-          setIsLoggedIn(false);
-        }
+        // Set state directly from saved data
+        setSessionData(parsedSession);
+        setUserName(savedUserName);
+        setIsLoggedIn(true);
+        
+        // Fetch chats after setting session
+        await fetchChats();
       }
     };
 
@@ -106,11 +79,11 @@ export default function TelegramApp() {
   }, []);
 
   useEffect(() => {
-    if (sessionData && isLoggedIn) {
+    if (sessionData?.sessionString) {
       localStorage.setItem('telegramSession', JSON.stringify(sessionData));
       localStorage.setItem('isLoggedIn', 'true');
     }
-  }, [sessionData, isLoggedIn]);
+  }, [sessionData]);
 
   const initiateLogin = async () => {
     const loadingToast = toast.loading("Sending verification code...");
@@ -161,10 +134,8 @@ export default function TelegramApp() {
           phoneNumber,
         };
         
-        // Store all necessary data in localStorage
-        localStorage.setItem('telegramSession', JSON.stringify(newSessionData));
-        localStorage.setItem('telegramUserName', response.data.userName);
-        localStorage.setItem('isLoggedIn', 'true');
+        // Save session data
+        saveSession(newSessionData, response.data.userName);
         
         // Update state
         setSessionData(newSessionData);
@@ -249,21 +220,17 @@ export default function TelegramApp() {
     }
   };
 
-  const handleLogout = useCallback(() => {
-    setIsLoggedIn(false);
-    setSessionData(null);
-    setUserName(null);
-    setMessages([]);
-    setChatList([]);
-    setSelectedChat(null);
-    
-    // Clear all stored data
+  const handleLogout = () => {
     localStorage.removeItem('telegramSession');
     localStorage.removeItem('telegramUserName');
     localStorage.removeItem('isLoggedIn');
-    
-    toast.success('Logged out successfully');
-  }, []);
+    setSessionData(null);
+    setUserName(null);
+    setIsLoggedIn(false);
+    setChatList([]);
+    setSelectedChat(null);
+    setMessages([]);
+  };
 
   const handleApiError = useCallback(
     async (error, errorMessage) => {
@@ -449,27 +416,6 @@ export default function TelegramApp() {
     }
   };
 
-  // Add periodic session refresh
-  useEffect(() => {
-    let refreshInterval;
-
-    if (isLoggedIn && sessionData?.sessionString) {
-      refreshInterval = setInterval(async () => {
-        const refreshed = await refreshSession(sessionData.sessionString);
-        if (!refreshed) {
-          handleLogout();
-          toast.error('Session expired. Please log in again.');
-        }
-      }, 30 * 60 * 1000); // 30 minutes
-    }
-
-    return () => {
-      if (refreshInterval) {
-        clearInterval(refreshInterval);
-      }
-    };
-  }, [isLoggedIn, sessionData?.sessionString, handleLogout]);
-
   // Add handleBackToSidebar function
   const handleBackToSidebar = () => {
     setShowSidebar(true);
@@ -486,6 +432,15 @@ export default function TelegramApp() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Add this function to handle session storage
+  const saveSession = (sessionData, userName) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('telegramSession', JSON.stringify(sessionData));
+      localStorage.setItem('telegramUserName', userName);
+      localStorage.setItem('isLoggedIn', 'true');
+    }
+  };
 
   return (
     <div className={styles.telegramApp}>
