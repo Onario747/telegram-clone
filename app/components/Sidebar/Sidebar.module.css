@@ -224,11 +224,26 @@
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .chatList {
+    height: calc(100vh - 120px); /* Adjust for header height */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px;
+  }
+
+  .chatItem {
+    padding: 10px 16px;
   }
 
   .searchBar {
-    padding: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--background-primary);
+    z-index: 1;
   }
 
   .searchInput input {
