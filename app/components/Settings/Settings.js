@@ -17,6 +17,8 @@ import { useTheme } from "../../context/ThemeContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 import styles from "./Settings.module.css";
+import EditProfile from "../User/EditProfile";
+import { AnimatePresence } from "framer-motion";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -29,6 +31,7 @@ export default function Settings({
   const { isDarkMode, toggleTheme } = useTheme();
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -53,6 +56,10 @@ export default function Settings({
       fetchUserInfo();
     }
   }, [username, sessionString]);
+
+  const handleProfileUpdate = (updatedData) => {
+    setUserInfo(updatedData);
+  };
 
   // Enhanced animation variants
   const overlayVariants = {
@@ -148,7 +155,10 @@ export default function Settings({
                     {userInfo.firstName?.[0] || userInfo.username[0]}
                   </div>
                 )}
-                <button className={styles.editPhotoButton}>
+                <button 
+                  className={styles.editPhotoButton}
+                  onClick={() => setIsEditing(true)}
+                >
                   <FiEdit2 size={20} />
                 </button>
               </div>
@@ -156,9 +166,7 @@ export default function Settings({
               <div className={styles.profileInfo}>
                 <div className={styles.infoGroup}>
                   <h3>Name</h3>
-                  <p>{`${userInfo.firstName || ""} ${
-                    userInfo.lastName || ""
-                  }`}</p>
+                  <p>{`${userInfo.firstName || ""} ${userInfo.lastName || ""}`}</p>
                 </div>
 
                 <div className={styles.infoGroup}>
@@ -187,19 +195,19 @@ export default function Settings({
 
           <div className={styles.settingsGroup}>
             <motion.button
-              className={`${styles.settingsItem} ${
-                isDarkMode ? styles.active : ""
-              }`}
-              variants={settingsItemVariants}
-              initial="hidden"
-              animate="visible"
-              custom={0}
+              className={styles.settingsItem}
+              onClick={() => setIsEditing(true)}
+            >
+              <FiUser size={20} />
+              <span>Edit Profile</span>
+            </motion.button>
+
+            <motion.button
+              className={styles.settingsItem}
               onClick={toggleTheme}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
               {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-              <span>Theme ({isDarkMode ? "Light" : "Dark"} Mode)</span>
+              <span>Theme</span>
             </motion.button>
 
             <motion.button
@@ -231,17 +239,22 @@ export default function Settings({
 
           <motion.button
             className={`${styles.settingsItem} ${styles.logoutButton}`}
-            variants={settingsItemVariants}
-            initial="hidden"
-            animate="visible"
-            custom={3}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
             onClick={onLogout}
           >
             Logout
           </motion.button>
         </div>
+
+        <AnimatePresence>
+          {isEditing && userInfo && (
+            <EditProfile
+              user={userInfo}
+              onClose={() => setIsEditing(false)}
+              sessionString={sessionString}
+              onUpdate={handleProfileUpdate}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
   );

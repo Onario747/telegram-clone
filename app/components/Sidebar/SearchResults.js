@@ -24,7 +24,7 @@ export function SearchResults({ users, channels, onSelect, onlineUsers }) {
             <motion.div
               key={user.id}
               className={styles.searchResultItem}
-              onClick={() => onSelect(user)}
+              onClick={() => onSelect({ ...user, type: "User" })}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
@@ -35,8 +35,8 @@ export function SearchResults({ users, channels, onSelect, onlineUsers }) {
                   alt={user.username}
                   className={styles.profileImage}
                   onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
                   }}
                 />
               ) : (
@@ -70,7 +70,7 @@ export function SearchResults({ users, channels, onSelect, onlineUsers }) {
             <motion.div
               key={channel.id}
               className={styles.searchResultItem}
-              onClick={() => onSelect({ ...channel, type: 'Channel' })}
+              onClick={() => onSelect({ ...channel, type: "Channel" })}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
@@ -81,8 +81,8 @@ export function SearchResults({ users, channels, onSelect, onlineUsers }) {
                   alt={channel.title}
                   className={styles.profileImage}
                   onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
                   }}
                 />
               ) : (
@@ -94,7 +94,8 @@ export function SearchResults({ users, channels, onSelect, onlineUsers }) {
                 <div>
                   <div className={styles.username}>{channel.title}</div>
                   <div className={styles.lastMessage}>
-                    {channel.username ? `@${channel.username}` : ''} • {channel.participants.toLocaleString()} members
+                    {channel.username ? `@${channel.username}` : ""} •{" "}
+                    {channel.participants.toLocaleString()} members
                   </div>
                 </div>
               </div>
@@ -104,9 +105,7 @@ export function SearchResults({ users, channels, onSelect, onlineUsers }) {
       )}
 
       {users.length === 0 && channels.length === 0 && (
-        <div className={styles.noResults}>
-          No results found
-        </div>
+        <div className={styles.noResults}>No results found</div>
       )}
     </div>
   );

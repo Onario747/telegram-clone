@@ -8,11 +8,11 @@ export default function MessageBubble({ message, onReact }) {
   const [showOptions, setShowOptions] = useState(false);
   
   // Check if the message is from the current user (fromId is null)
-  const isFromMe = !message.fromId;
+  // const isFromMe = !message.fromId;
 
   return (
     <motion.div
-      className={`${styles.messageContainer} ${isFromMe ? styles.sent : styles.received}`}
+      className={`${styles.messageContainer} ${'fromId' in message ? styles.received : styles.sent}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       onMouseEnter={() => setShowOptions(true)}

@@ -382,3 +382,13 @@
     transform: translateY(0);
   }
 }
+
+.noPostingPermission {
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  color: var(--text-secondary);
+  background-color: var(--background-primary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}

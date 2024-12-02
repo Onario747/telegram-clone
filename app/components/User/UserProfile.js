@@ -5,12 +5,14 @@ import { FiX, FiPhone, FiMail, FiInfo } from "react-icons/fi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import styles from "./UserProfile.module.css";
+import EditProfile from "./EditProfile";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function UserProfile({ user, onClose, sessionString }) {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   const formatProfilePhoto = (base64String) => {
     if (base64String.startsWith('data:')) {
@@ -58,6 +60,10 @@ export default function UserProfile({ user, onClose, sessionString }) {
       fetchInfo();
     }
   }, [user.username, sessionString, user.type]);
+
+  const handleUpdate = (updatedData) => {
+    setUserInfo(updatedData);
+  };
 
   return (
     <motion.div
@@ -153,9 +159,26 @@ export default function UserProfile({ user, onClose, sessionString }) {
       )}
 
       <div className={styles.actions}>
+        <button 
+          className={styles.actionButton}
+          onClick={() => setIsEditing(true)}
+        >
+          Edit Profile
+        </button>
         <button className={styles.actionButton}>Send Message</button>
         <button className={styles.actionButton}>Share Contact</button>
       </div>
+
+      <AnimatePresence>
+        {isEditing && (
+          <EditProfile
+            user={userInfo}
+            onClose={() => setIsEditing(false)}
+            sessionString={sessionString}
+            onUpdate={handleUpdate}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

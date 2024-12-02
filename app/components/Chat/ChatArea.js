@@ -39,14 +39,17 @@ export default function ChatArea({
   const [showProfile, setShowProfile] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [isMember, setIsMember] = useState(selectedChat?.isMember !== false);
+  const [canPost, setCanPost] = useState(true);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
   useEffect(() => {
     if (selectedChat?.type === 'Channel') {
       setIsMember(selectedChat.isMember !== false);
+      setCanPost(selectedChat.canPost !== false);
     } else {
       setIsMember(true);
+      setCanPost(true);
     }
   }, [selectedChat]);
 
@@ -64,6 +67,7 @@ export default function ChatArea({
 
       if (response.data) {
         setIsMember(true);
+        setCanPost(true);
         toast.success('Successfully joined channel!', { id: loadingToast });
       }
     } catch (error) {
@@ -184,6 +188,10 @@ export default function ChatArea({
           >
             {isJoining ? 'Joining...' : 'Join Channel'}
           </button>
+        ) : !canPost ? (
+          <div className={styles.noPostingPermission}>
+            You don't have permission to post in this channel
+          </div>
         ) : (
           <>
             <FileUpload onFileSelect={onSendFile} />
@@ -192,7 +200,14 @@ export default function ChatArea({
               onChange={setMessage}
               onSend={() => {
                 if (message.trim()) {
-                  onSendMessage(message);
+                  onSendMessage(message).catch((error) => {
+                    if (error.response?.data?.error?.includes('CHAT_ADMIN_REQUIRED')) {
+                      setCanPost(false);
+                      toast.error('You need to be an admin to post in this channel');
+                    } else {
+                      toast.error('Failed to send message');
+                    }
+                  });
                   setMessage("");
                 }
               }}
