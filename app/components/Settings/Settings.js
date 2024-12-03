@@ -171,7 +171,7 @@ export default function Settings({
 
                 <div className={styles.infoGroup}>
                   <h3>Username</h3>
-                  <p>@{userInfo.username}</p>
+                  <p>@KuCoinAlicia</p>
                 </div>
 
                 {userInfo.bio && (
