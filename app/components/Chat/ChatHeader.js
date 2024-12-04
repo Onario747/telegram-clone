@@ -1,25 +1,25 @@
 "use client";
-import { FiArrowLeft, FiMenu } from 'react-icons/fi';
-import styles from './ChatArea.module.css';
+import { FiArrowLeft, FiMenu } from "react-icons/fi";
+import styles from "./ChatArea.module.css";
 
-export function ChatHeader({ 
-  chat, 
-  onBackClick, 
-  onMenuClick, 
+export function ChatHeader({
+  chat,
+  onBackClick,
+  onMenuClick,
   isMobile,
-  onProfileClick
+  onProfileClick,
 }) {
   const formatProfilePhoto = (base64String) => {
     if (!base64String) return null;
-    return base64String.startsWith('data:') 
-      ? base64String 
+    return base64String.startsWith("data:")
+      ? base64String
       : `data:image/jpeg;base64,${base64String}`;
   };
 
   return (
     <div className={styles.chatHeader}>
       {isMobile && (
-        <button 
+        <button
           className={styles.backButton}
           onClick={onBackClick}
           aria-label="Back"
@@ -27,11 +27,11 @@ export function ChatHeader({
           <FiArrowLeft size={24} />
         </button>
       )}
-      
-      <div 
-        className={styles.chatInfo} 
+
+      <div
+        className={styles.chatInfo}
         onClick={() => onProfileClick(chat)}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: "pointer" }}
       >
         {chat.profilePhoto ? (
           <img
@@ -40,25 +40,25 @@ export function ChatHeader({
             className={styles.chatAvatar}
             onError={(e) => {
               e.target.onerror = null;
-              e.target.style.display = 'none';
-              const placeholder = document.createElement('div');
+              e.target.style.display = "none";
+              const placeholder = document.createElement("div");
               placeholder.className = styles.chatAvatarPlaceholder;
-              placeholder.textContent = chat.initial || '?';
+              placeholder.textContent = chat.initial || "?";
               e.target.parentNode.appendChild(placeholder);
             }}
           />
         ) : (
           <div className={styles.chatAvatarPlaceholder}>
-            {chat.initial || '?'}
+            {chat.initial || "?"}
           </div>
         )}
         <div className={styles.chatDetails}>
-          <h2>{chat.username || chat.title || 'Unknown'}</h2>
-          <p>{chat.type === 'Channel' ? 'Channel' : 'User'}</p>
+          <h2>{chat.username || chat.title || "Unknown"}</h2>
+          <p>{chat.type === "Channel" ? "Channel" : "User"}</p>
         </div>
       </div>
 
-      <button 
+      <button
         className={styles.menuButton}
         onClick={onMenuClick}
         aria-label="Menu"
@@ -67,4 +67,4 @@ export function ChatHeader({
       </button>
     </div>
   );
-} 
+}

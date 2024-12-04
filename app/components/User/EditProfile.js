@@ -39,7 +39,7 @@ export default function EditProfile({
 
   const getChangedFields = () => {
     const changedFields = {};
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       if (formData[key] !== (user[key] || "")) {
         changedFields[key] = formData[key];
       }
@@ -54,7 +54,7 @@ export default function EditProfile({
 
     try {
       const changedFields = getChangedFields();
-      
+
       if (Object.keys(changedFields).length === 0) {
         toast.success("No changes to update", { id: loadingToast });
         onClose();
@@ -68,29 +68,31 @@ export default function EditProfile({
 
       if (response.data?.result) {
         if (response.data.result.username !== user.username) {
-          localStorage.setItem('telegramUserName', response.data.result.username);
+          localStorage.setItem(
+            "telegramUserName",
+            response.data.result.username
+          );
         }
 
         toast.success("Profile updated successfully!", { id: loadingToast });
-        
+
         onUpdate?.({
           ...user,
           ...response.data.result,
-          firstName: response.data.result.firstName || '',
-          lastName: response.data.result.lastName || '',
-          username: response.data.result.username || '',
-          bio: response.data.result.bio || '',
-          profilePhoto: user.profilePhoto
+          firstName: response.data.result.firstName || "",
+          lastName: response.data.result.lastName || "",
+          username: response.data.result.username || "",
+          bio: response.data.result.bio || "",
+          profilePhoto: user.profilePhoto,
         });
-        
+
         onClose();
       }
     } catch (error) {
       console.error("Failed to update profile:", error);
-      toast.error(
-        error.response?.data?.error || "Failed to update profile", 
-        { id: loadingToast }
-      );
+      toast.error(error.response?.data?.error || "Failed to update profile", {
+        id: loadingToast,
+      });
     } finally {
       setLoading(false);
     }
@@ -100,42 +102,45 @@ export default function EditProfile({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size should be less than 5MB');
+      toast.error("Image size should be less than 5MB");
       return;
     }
 
-    const loadingToast = toast.loading('Uploading profile photo...');
+    const loadingToast = toast.loading("Uploading profile photo...");
 
     try {
       const formData = new FormData();
-      formData.append('sessionString', sessionString);
-      formData.append('file', file);
+      formData.append("sessionString", sessionString);
+      formData.append("file", file);
 
-      const response = await axios.put(`${BASE_URL}/t/api/user/edit/image`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axios.put(
+        `${BASE_URL}/t/api/user/edit/image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.data) {
-        toast.success('Profile photo updated!', { id: loadingToast });
+        toast.success("Profile photo updated!", { id: loadingToast });
         onUpdate?.({
           ...user,
           profilePhoto: URL.createObjectURL(file),
         });
       }
     } catch (error) {
-      console.error('Failed to upload photo:', error);
-      toast.error(
-        error.response?.data?.error || 'Failed to upload photo',
-        { id: loadingToast }
-      );
+      console.error("Failed to upload photo:", error);
+      toast.error(error.response?.data?.error || "Failed to upload photo", {
+        id: loadingToast,
+      });
     }
   };
 
@@ -179,8 +184,8 @@ export default function EditProfile({
                 {getInitial(formData.username)}
               </div>
             )}
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={styles.uploadOverlay}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -192,10 +197,10 @@ export default function EditProfile({
             type="file"
             accept="image/*"
             onChange={handlePhotoUpload}
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
           />
-          <button 
-            type="button" 
+          <button
+            type="button"
             className={styles.changePhotoButton}
             onClick={() => fileInputRef.current?.click()}
           >

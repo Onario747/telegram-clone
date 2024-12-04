@@ -2,16 +2,17 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import axios from "axios";
+import toast from "react-hot-toast";
 import MessageBubble from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { ChatHeader } from "./ChatHeader";
 import { FileUpload } from "../../components/shared/FileUpload";
 import { VoiceRecorder } from "../../components/shared/VoiceRecorder";
 import { VideoCall } from "../../components/shared/VideoCall";
-import UserProfile from '../User/UserProfile';
+import UserProfile from "../User/UserProfile";
 import styles from "./ChatArea.module.css";
+import { ChatMenu } from "./ChatMenu";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -43,8 +44,80 @@ export default function ChatArea({
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
+  const [showMenu, setShowMenu] = useState(false);
+  const [menuPosition, setMenuPosition] = useState(null);
+
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMenuPosition({
+      top: `${rect.bottom + 5}px`, // Added small gap
+      right: `${window.innerWidth - rect.right}px`,
+    });
+    setShowMenu((prev) => !prev);
+  };
+
   useEffect(() => {
-    if (selectedChat?.type === 'Channel') {
+    const handleClickOutside = (e) => {
+      if (showMenu) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showMenu]);
+
+  const handleBlockUser = async () => {
+    if (!sessionString || !selectedChat?.username) return;
+
+    const loadingToast = toast.loading("Blocking user...");
+
+    try {
+      const response = await axios.post(`${BASE_URL}/t/api/chats/block`, {
+        sessionString,
+        usernameOrUserId: selectedChat.username,
+      });
+
+      if (response.data) {
+        toast.success("User blocked successfully", { id: loadingToast });
+        onBackClick(); // Go back to chat list
+      }
+    } catch (error) {
+      console.error("Failed to block user:", error);
+      toast.error(error.response?.data?.error || "Failed to block user", {
+        id: loadingToast,
+      });
+    }
+    setShowMenu(false);
+  };
+
+  const handleLeaveChannel = async () => {
+    if (!sessionString || !selectedChat?.username) return;
+
+    const loadingToast = toast.loading("Leaving channel...");
+
+    try {
+      const response = await axios.post(`${BASE_URL}/t/api/channel/leave`, {
+        sessionString,
+        groupUsername: selectedChat.username,
+      });
+
+      if (response.data) {
+        toast.success("Left channel successfully", { id: loadingToast });
+        onBackClick(); // Go back to chat list
+      }
+    } catch (error) {
+      console.error("Failed to leave channel:", error);
+      toast.error(error.response?.data?.error || "Failed to leave channel", {
+        id: loadingToast,
+      });
+    }
+    setShowMenu(false);
+  };
+
+  useEffect(() => {
+    if (selectedChat?.type === "Channel") {
       setIsMember(selectedChat.isMember !== false);
       setCanPost(selectedChat.canPost !== false);
     } else {
@@ -57,29 +130,31 @@ export default function ChatArea({
     if (!sessionString || !selectedChat?.username) return;
 
     setIsJoining(true);
-    const loadingToast = toast.loading('Joining channel...');
+    const loadingToast = toast.loading("Joining channel...");
 
     try {
       const response = await axios.post(`${BASE_URL}/t/api/channel/join`, {
         sessionString,
-        groupUsername: selectedChat.username
+        groupUsername: selectedChat.username,
       });
 
       if (response.data) {
         setIsMember(true);
         setCanPost(true);
-        toast.success('Successfully joined channel!', { id: loadingToast });
+        toast.success("Successfully joined channel!", { id: loadingToast });
       }
     } catch (error) {
-      console.error('Failed to join channel:', error);
-      toast.error(error.response?.data?.error || 'Failed to join channel', { id: loadingToast });
+      console.error("Failed to join channel:", error);
+      toast.error(error.response?.data?.error || "Failed to join channel", {
+        id: loadingToast,
+      });
     } finally {
       setIsJoining(false);
     }
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -88,41 +163,41 @@ export default function ChatArea({
 
   const handleScroll = (e) => {
     const { scrollTop } = e.target;
-    
+
     if (scrollTop < 100 && hasMore && !loading) {
       onLoadMore();
     }
   };
 
   const getInitial = (text) => {
-    if (!text) return '?';
+    if (!text) return "?";
     return text.charAt(0).toUpperCase();
   };
 
   const renderMessageArea = () => {
     if (loading) {
-      return (
-        <div className={styles.loadingIndicator}>
-          Loading messages...
-        </div>
-      );
+      return <div className={styles.loadingIndicator}>Loading messages...</div>;
     }
 
     // Check if messages array is empty or undefined
-    if (!messages || messages.length === 0 || !messages.some(msg => msg.message)) {
+    if (
+      !messages ||
+      messages.length === 0 ||
+      !messages.some((msg) => msg.message)
+    ) {
       return (
         <div className={styles.noMessagesContainer}>
           <div className={styles.noMessagesContent}>
             <h3>Start a conversation</h3>
             <p>Say hello to {selectedChat.title || selectedChat.username}</p>
-            <button 
+            <button
               className={styles.startChatButton}
               onClick={() => {
-                const textarea = document.querySelector('textarea');
+                const textarea = document.querySelector("textarea");
                 if (textarea) {
                   textarea.focus();
-                  textarea.value = 'Hi! 👋';
-                  setMessage('Hi! 👋');
+                  textarea.value = "Hi! 👋";
+                  setMessage("Hi! 👋");
                 }
               }}
             >
@@ -134,7 +209,7 @@ export default function ChatArea({
     }
 
     return messages
-      .filter(message => message.message) // Only show messages with text
+      .filter((message) => message.message) // Only show messages with text
       .sort((a, b) => a.date - b.date)
       .map((message) => (
         <MessageBubble
@@ -147,7 +222,11 @@ export default function ChatArea({
 
   if (!selectedChat) {
     return (
-      <div className={`${styles.noChatSelected} ${isDarkMode ? styles.dark : styles.light}`}>
+      <div
+        className={`${styles.noChatSelected} ${
+          isDarkMode ? styles.dark : styles.light
+        }`}
+      >
         <div className={styles.noChatContent}>
           <h2>Select a chat to start messaging</h2>
           <p>Choose from your existing conversations or start a new one</p>
@@ -157,20 +236,34 @@ export default function ChatArea({
   }
 
   return (
-    <div className={`${styles.chatArea} ${isDarkMode ? styles.dark : styles.light}`}>
-      <ChatHeader 
+    <div
+      className={`${styles.chatArea} ${
+        isDarkMode ? styles.dark : styles.light
+      }`}
+    >
+      <ChatHeader
         chat={{
           ...selectedChat,
-          username: selectedChat.username || selectedChat.title || 'Unknown',
-          initial: getInitial(selectedChat.username || selectedChat.title)
+          username: selectedChat.username || selectedChat.title || "Unknown",
+          initial: getInitial(selectedChat.username || selectedChat.title),
         }}
         onBackClick={onBackClick}
-        onMenuClick={onMenuClick}
+        onMenuClick={handleMenuClick}
         isMobile={isMobile}
         onProfileClick={() => setShowProfile(true)}
       />
-      
-      <div 
+
+      {showMenu && (
+        <ChatMenu
+          chat={selectedChat}
+          onClose={() => setShowMenu(false)}
+          onBlock={handleBlockUser}
+          onLeave={handleLeaveChannel}
+          position={menuPosition}
+        />
+      )}
+
+      <div
         className={styles.messagesContainer}
         ref={messagesContainerRef}
         onScroll={handleScroll}
@@ -178,15 +271,15 @@ export default function ChatArea({
         {renderMessageArea()}
         <div ref={messagesEndRef} />
       </div>
-      
+
       <div className={styles.inputArea}>
-        {selectedChat.type === 'Channel' && !isMember ? (
-          <button 
+        {selectedChat.type === "Channel" && !isMember ? (
+          <button
             className={styles.joinButton}
             onClick={handleJoinChannel}
             disabled={isJoining}
           >
-            {isJoining ? 'Joining...' : 'Join Channel'}
+            {isJoining ? "Joining..." : "Join Channel"}
           </button>
         ) : !canPost ? (
           <div className={styles.noPostingPermission}>
@@ -201,11 +294,17 @@ export default function ChatArea({
               onSend={() => {
                 if (message.trim()) {
                   onSendMessage(message).catch((error) => {
-                    if (error.response?.data?.error?.includes('CHAT_ADMIN_REQUIRED')) {
+                    if (
+                      error.response?.data?.error?.includes(
+                        "CHAT_ADMIN_REQUIRED"
+                      )
+                    ) {
                       setCanPost(false);
-                      toast.error('You need to be an admin to post in this channel');
+                      toast.error(
+                        "You need to be an admin to post in this channel"
+                      );
                     } else {
-                      toast.error('Failed to send message');
+                      toast.error("Failed to send message");
                     }
                   });
                   setMessage("");

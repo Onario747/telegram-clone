@@ -14,17 +14,17 @@ const BASE_URL = "https://xelegram-m5kh.onrender.com";
 
 export default function TelegramApp() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedSession = localStorage.getItem('telegramSession');
-      return !!savedSession; // Convert to boolean
+    if (typeof window !== "undefined") {
+      const savedSession = localStorage.getItem("telegramSession");
+      return !!savedSession;
     }
     return false;
   });
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [sessionData, setSessionData] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedSession = localStorage.getItem('telegramSession');
+    if (typeof window !== "undefined") {
+      const savedSession = localStorage.getItem("telegramSession");
       return savedSession ? JSON.parse(savedSession) : null;
     }
     return null;
@@ -49,8 +49,8 @@ export default function TelegramApp() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [userName, setUserName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedUserName = localStorage.getItem('telegramUserName');
+    if (typeof window !== "undefined") {
+      const savedUserName = localStorage.getItem("telegramUserName");
       return savedUserName || null;
     }
     return null;
@@ -58,19 +58,17 @@ export default function TelegramApp() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const savedSession = localStorage.getItem('telegramSession');
-      const savedUserName = localStorage.getItem('telegramUserName');
-      const isLoggedInSaved = localStorage.getItem('isLoggedIn');
+      const savedSession = localStorage.getItem("telegramSession");
+      const savedUserName = localStorage.getItem("telegramUserName");
+      const isLoggedInSaved = localStorage.getItem("isLoggedIn");
 
-      if (savedSession && isLoggedInSaved === 'true') {
+      if (savedSession && isLoggedInSaved === "true") {
         const parsedSession = JSON.parse(savedSession);
-        
-        // Set state directly from saved data
+
         setSessionData(parsedSession);
         setUserName(savedUserName);
         setIsLoggedIn(true);
-        
-        // Fetch chats after setting session
+
         await fetchChats();
       }
     };
@@ -80,8 +78,8 @@ export default function TelegramApp() {
 
   useEffect(() => {
     if (sessionData?.sessionString) {
-      localStorage.setItem('telegramSession', JSON.stringify(sessionData));
-      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem("telegramSession", JSON.stringify(sessionData));
+      localStorage.setItem("isLoggedIn", "true");
     }
   }, [sessionData]);
 
@@ -112,11 +110,11 @@ export default function TelegramApp() {
   };
 
   const verifyCode = async () => {
-    const loadingToast = toast.loading('Verifying code...');
+    const loadingToast = toast.loading("Verifying code...");
     try {
       setLoading(true);
       if (!sessionData) {
-        throw new Error('Session data is missing');
+        throw new Error("Session data is missing");
       }
 
       const { phoneCodeHash, sessionString } = sessionData;
@@ -133,21 +131,21 @@ export default function TelegramApp() {
           sessionString: response.data.sessionString,
           phoneNumber,
         };
-        
+
         // Save session data
         saveSession(newSessionData, response.data.userName);
-        
+
         // Update state
         setSessionData(newSessionData);
         setUserName(response.data.userName);
         setIsLoggedIn(true);
-        
-        toast.success('Successfully logged in!', { id: loadingToast });
+
+        toast.success("Successfully logged in!", { id: loadingToast });
         await fetchChats();
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Verification failed';
-      console.error('Verification failed:', errorMessage);
+      const errorMessage = error.response?.data?.error || "Verification failed";
+      console.error("Verification failed:", errorMessage);
       toast.error(errorMessage, { id: loadingToast });
     } finally {
       setLoading(false);
@@ -221,9 +219,9 @@ export default function TelegramApp() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('telegramSession');
-    localStorage.removeItem('telegramUserName');
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem("telegramSession");
+    localStorage.removeItem("telegramUserName");
+    localStorage.removeItem("isLoggedIn");
     setSessionData(null);
     setUserName(null);
     setIsLoggedIn(false);
@@ -270,39 +268,39 @@ export default function TelegramApp() {
     if (!sessionData?.sessionString || !chat) return;
 
     setMessagesLoading(true);
-    const loadingToast = toast.loading('Loading messages...');
+    const loadingToast = toast.loading("Loading messages...");
 
     try {
       let response;
-      
+
       // Check chat type from the API response
       switch (chat.type) {
-        case 'Channel':
+        case "Channel":
           response = await axios.post(`${BASE_URL}/t/api/channel/messages`, {
             sessionString: sessionData.sessionString,
             channelUsername: chat.username,
             messageIds: [],
             limit: MESSAGES_PER_PAGE,
-            offset: offset
+            offset: offset,
           });
           break;
 
-        case 'User':
+        case "User":
           response = await axios.post(`${BASE_URL}/t/api/user/messages`, {
             sessionString: sessionData.sessionString,
             userUsername: chat.username,
             limit: MESSAGES_PER_PAGE,
-            offset: offset
+            offset: offset,
           });
           break;
 
-        case 'ChatForbidden':
-          toast.error('This chat is not accessible');
+        case "ChatForbidden":
+          toast.error("This chat is not accessible");
           setMessagesLoading(false);
           return;
 
         default:
-          toast.error('Unsupported chat type');
+          toast.error("Unsupported chat type");
           setMessagesLoading(false);
           return;
       }
@@ -311,14 +309,20 @@ export default function TelegramApp() {
         if (offset === 0) {
           setMessages(response.data.messages);
         } else {
-          setMessages(prevMessages => [...prevMessages, ...response.data.messages]);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            ...response.data.messages,
+          ]);
         }
 
         setHasMoreMessages(response.data.messages.length === MESSAGES_PER_PAGE);
-        toast.success('Messages loaded', { id: loadingToast });
+        toast.success("Messages loaded", { id: loadingToast });
       }
     } catch (error) {
-      const shouldRetry = await handleApiError(error, 'Failed to load messages');
+      const shouldRetry = await handleApiError(
+        error,
+        "Failed to load messages"
+      );
       if (shouldRetry) {
         await fetchMessages(chat, offset);
       }
@@ -329,31 +333,32 @@ export default function TelegramApp() {
 
   const loadMoreMessages = async () => {
     if (messagesLoading || !hasMoreMessages || !selectedChat) return;
-    
+
     const nextOffset = messageOffset + MESSAGES_PER_PAGE;
     setMessageOffset(nextOffset);
     await fetchMessages(selectedChat, nextOffset);
   };
 
   const handleSendMessage = async (messageText) => {
-    if (!selectedChat || !sessionData?.sessionString || !messageText.trim()) return;
+    if (!selectedChat || !sessionData?.sessionString || !messageText.trim())
+      return;
 
-    const loadingToast = toast.loading('Sending message...');
+    const loadingToast = toast.loading("Sending message...");
     try {
       let response;
 
       // Check if it's a channel or user chat
-      if (selectedChat.type === 'Channel') {
+      if (selectedChat.type === "Channel") {
         response = await axios.post(`${BASE_URL}/t/api/channel/message`, {
           sessionString: sessionData.sessionString,
           channelUsername: selectedChat.username,
-          messageText: messageText.trim()
+          messageText: messageText.trim(),
         });
       } else {
         response = await axios.post(`${BASE_URL}/t/api/user/message`, {
           sessionString: sessionData.sessionString,
           destination: selectedChat.username || selectedChat.phone,
-          messageText: messageText.trim()
+          messageText: messageText.trim(),
         });
       }
 
@@ -366,18 +371,19 @@ export default function TelegramApp() {
           fromId: null, // Indicates it's from current user
           peerId: {
             userId: selectedChat.id,
-            className: selectedChat.type === 'Channel' ? 'PeerChannel' : 'PeerUser'
-          }
+            className:
+              selectedChat.type === "Channel" ? "PeerChannel" : "PeerUser",
+          },
         };
 
-        setMessages(prevMessages => [...prevMessages, newMessage]);
-        toast.success('Message sent!', { id: loadingToast });
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        toast.success("Message sent!", { id: loadingToast });
 
         // Optionally refresh messages to get the actual message from server
         await fetchMessages(selectedChat);
       }
     } catch (error) {
-      const shouldRetry = await handleApiError(error, 'Failed to send message');
+      const shouldRetry = await handleApiError(error, "Failed to send message");
       if (shouldRetry) {
         // Retry sending the message with refreshed session
         await handleSendMessage(messageText);
@@ -386,32 +392,32 @@ export default function TelegramApp() {
   };
 
   const handleSendFile = async (file) => {
-    toast.error('File sending feature is coming soon!');
-    console.log('File to be sent:', file);
+    toast.error("File sending feature is coming soon!");
+    console.log("File to be sent:", file);
   };
 
   const handleSendVoice = async (audioBlob) => {
-    toast.error('Voice message feature is coming soon!');
-    console.log('Voice message to be sent:', audioBlob);
+    toast.error("Voice message feature is coming soon!");
+    console.log("Voice message to be sent:", audioBlob);
   };
 
   // Add refreshSession function
   const refreshSession = async (sessionString) => {
     try {
       const response = await axios.post(`${BASE_URL}/t/api/refresh`, {
-        sessionString
+        sessionString,
       });
 
       if (response.data.sessionString) {
-        setSessionData(prev => ({
+        setSessionData((prev) => ({
           ...prev,
-          sessionString: response.data.sessionString
+          sessionString: response.data.sessionString,
         }));
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Session refresh failed:', error);
+      console.error("Session refresh failed:", error);
       return false;
     }
   };
@@ -429,16 +435,16 @@ export default function TelegramApp() {
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Add this function to handle session storage
   const saveSession = (sessionData, userName) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('telegramSession', JSON.stringify(sessionData));
-      localStorage.setItem('telegramUserName', userName);
-      localStorage.setItem('isLoggedIn', 'true');
+    if (typeof window !== "undefined") {
+      localStorage.setItem("telegramSession", JSON.stringify(sessionData));
+      localStorage.setItem("telegramUserName", userName);
+      localStorage.setItem("isLoggedIn", "true");
     }
   };
 
@@ -476,7 +482,7 @@ export default function TelegramApp() {
               />
             </div>
           )}
-          
+
           {/* On mobile, only show chat area when a chat is selected */}
           {(selectedChat || !isMobile) && (
             <div className={styles.chatArea}>
@@ -489,7 +495,7 @@ export default function TelegramApp() {
                 onSendMessage={handleSendMessage}
                 onSendFile={handleSendFile}
                 onSendVoice={handleSendVoice}
-                onBackClick={() => setSelectedChat(null)} // This will show sidebar again
+                onBackClick={() => setSelectedChat(null)}
                 onMenuClick={() => setShowSettings(true)}
                 isMobile={isMobile}
                 sessionString={sessionData?.sessionString}

@@ -158,16 +158,16 @@ export default function UserProfile({ user, onClose, sessionString }) {
         <div className={styles.error}>Failed to load information</div>
       )}
 
-      <div className={styles.actions}>
+      {/* <div className={styles.actions}>
         <button 
           className={styles.actionButton}
           onClick={() => setIsEditing(true)}
         >
-          Edit Profile
+          Block C
         </button>
         <button className={styles.actionButton}>Send Message</button>
         <button className={styles.actionButton}>Share Contact</button>
-      </div>
+      </div> */}
 
       <AnimatePresence>
         {isEditing && (

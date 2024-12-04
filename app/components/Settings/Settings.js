@@ -155,7 +155,7 @@ export default function Settings({
                     {userInfo.firstName?.[0] || userInfo.username[0]}
                   </div>
                 )}
-                <button 
+                <button
                   className={styles.editPhotoButton}
                   onClick={() => setIsEditing(true)}
                 >
@@ -166,7 +166,9 @@ export default function Settings({
               <div className={styles.profileInfo}>
                 <div className={styles.infoGroup}>
                   <h3>Name</h3>
-                  <p>{`${userInfo.firstName || ""} ${userInfo.lastName || ""}`}</p>
+                  <p>{`${userInfo.firstName || ""} ${
+                    userInfo.lastName || ""
+                  }`}</p>
                 </div>
 
                 <div className={styles.infoGroup}>
@@ -181,12 +183,12 @@ export default function Settings({
                   </div>
                 )}
 
-                {userInfo.phone && (
+                {/* {userInfo.phone && (
                   <div className={styles.infoGroup}>
                     <h3>Phone</h3>
                     <p>{userInfo.phone}</p>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           ) : (
