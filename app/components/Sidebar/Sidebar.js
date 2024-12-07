@@ -32,6 +32,12 @@ export default function Sidebar({
       : "?";
   };
 
+  const getImageMimeType = (base64String) => {
+    // Implement logic to determine the image type based on the Base64 string
+    // This might involve checking the starting characters or storing the type separately
+    return "image/jpeg"; // or "image/png", etc.
+  };
+
   const filteredChats = chatList.filter(
     (chat) =>
       // Remove chats with null usernames
@@ -81,49 +87,55 @@ export default function Sidebar({
         />
       ) : (
         <div className={styles.chatList}>
-          {sortedChats.map((chat) => (
-            <motion.div
-              key={chat.chatRoomId}
-              className={styles.chatItem}
-              onClick={() => onChatSelect(chat)}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              {chat.profileImage ? (
-                <img
-                  src={chat.profileImage}
-                  alt={chat.title}
-                  className={styles.profileImage}
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                    e.target.nextSibling.style.display = "flex";
-                  }}
-                />
-              ) : (
-                <div className={styles.profileImagePlaceholder}>
-                  {getInitials(chat.title)}
-                </div>
-              )}
-              <div className={styles.chatInfo}>
-                <div>
-                  <div className={styles.username}>
-                    {chat.title} {chat.pinned && <FiThumbtack size={14} />}
+          {sortedChats.map((chat) => {
+            const photoSrc = chat.photo
+              ? `data:${getImageMimeType(chat.photo)};base64,${chat.photo}`
+              : null;
+
+            return (
+              <motion.div
+                key={chat.chatRoomId}
+                className={styles.chatItem}
+                onClick={() => onChatSelect(chat)}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {photoSrc ? (
+                  <img
+                    src={photoSrc}
+                    alt={chat.title}
+                    className={styles.profileImage}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                ) : (
+                  <div className={styles.profileImagePlaceholder}>
+                    {getInitials(chat.title)}
                   </div>
-                  {chat.latestMessage && (
-                    <div className={styles.lastMessage}>
-                      {chat.latestMessage.text || "No messages yet"}
+                )}
+                <div className={styles.chatInfo}>
+                  <div>
+                    <div className={styles.username}>
+                      {chat.title} {chat.pinned && <FiThumbtack size={14} />}
                     </div>
+                    {chat.latestMessage && (
+                      <div className={styles.lastMessage}>
+                        {chat.latestMessage.text || "No messages yet"}
+                      </div>
+                    )}
+                  </div>
+                  {chat.unreadMessagesCount > 0 && (
+                    <span className={styles.unreadBadge}>
+                      {chat.unreadMessagesCount}
+                    </span>
                   )}
                 </div>
-                {chat.unreadMessagesCount > 0 && (
-                  <span className={styles.unreadBadge}>
-                    {chat.unreadMessagesCount}
-                  </span>
-                )}
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
           {sortedChats.length === 0 && (
             <div className={styles.noChats}>No chats available</div>
           )}

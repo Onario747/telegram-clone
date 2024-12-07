@@ -161,8 +161,8 @@ export default function TelegramApp() {
         sessionString: sessionData.sessionString,
       });
 
-      if (response.data.chatList) {
-        setChatList(response.data.chatList);
+      if (response.data.chats) {
+        setChatList(response.data.chats);
         toast.success("Chats loaded successfully", { id: loadingToast });
       }
     } catch (error) {
