@@ -173,7 +173,7 @@ export default function Settings({
 
                 <div className={styles.infoGroup}>
                   <h3>Username</h3>
-                  <p>@KuCoinAlicia</p>
+                  <p>@KuCoin_Community_Official3</p>
                 </div>
 
                 {userInfo.bio && (
