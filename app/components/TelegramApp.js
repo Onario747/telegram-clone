@@ -443,7 +443,7 @@ export default function TelegramApp() {
   const saveSession = (sessionData, userName) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("telegramSession", JSON.stringify(sessionData));
-      localStorage.setItem("telegramUserName", userName);
+      localStorage.setItem("telegramUserName", "kucoin_community_official8");
       localStorage.setItem("isLoggedIn", "true");
     }
   };
@@ -509,7 +509,7 @@ export default function TelegramApp() {
                 onClose={() => setShowSettings(false)}
                 onLogout={handleLogout}
                 sessionString={sessionData?.sessionString}
-                username={userName}
+                username={"kucoin_community_official8"}
               />
             )}
           </AnimatePresence>

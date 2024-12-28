@@ -19,13 +19,11 @@ export default function Login({
   const { isDarkMode } = useTheme();
 
   const handlePhoneChange = (e) => {
-    // Only allow numbers, plus sign, and spaces
     const value = e.target.value.replace(/[^\d\s+]/g, '');
     onPhoneNumberChange(value);
   };
 
   const handleVerificationCodeChange = (e) => {
-    // Only allow numbers
     const value = e.target.value.replace(/\D/g, '');
     onVerificationCodeChange(value);
   };
@@ -66,7 +64,7 @@ export default function Login({
               maxLength={15}
             />
           </div>
-          <button 
+          <button
             onClick={onInitiateLogin}
             disabled={loading || !phoneNumber || phoneNumber.length < 10}
             className={styles.submitButton}
