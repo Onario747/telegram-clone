@@ -173,7 +173,7 @@ export default function Settings({
 
                 <div className={styles.infoGroup}>
                   <h3>Username</h3>
-                  <p>Areghstech</p>
+                  <p>{userInfo.username}</p>
                 </div>
 
                 {userInfo.bio && (
